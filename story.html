@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<title>Our First Date: A Birthday Quest</title>
+<style>
+html,body{margin:0;height:100%;background:#12091f;color:#fff;font-family:"Courier New",monospace;overflow:hidden}
+#wrap{position:relative;height:100%;display:flex;align-items:center;justify-content:center}
+canvas{height:100%;max-width:100%;aspect-ratio:2/3;image-rendering:pixelated;touch-action:none}
+#end{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:rgba(18,9,31,.6);text-align:center;padding:20px;box-sizing:border-box}
+#end div{max-width:420px}#end h1{color:#ffd54a;font-size:26px;margin:0 0 14px}
+#end p{font-size:16px;line-height:1.5;margin:8px 0;min-height:1.5em}#end small{color:#8f7bb8}
+#again{display:none;margin-top:18px;font:bold 14px "Courier New",monospace;color:#12091f;background:#ffd54a;border:0;padding:10px 18px;cursor:pointer}
+</style></head><body>
+<div id="wrap"><canvas id="c" width="320" height="480"></canvas>
+<div id="end"><div><h1 id="t"></h1><div id="msg"></div><small id="sig"></small><br><button id="again">PLAY AGAIN</button></div></div></div>
+<script>
+// ====== EDIT ME ======
+const CONFIG = {
+  title: "HAPPY BIRTHDAY, DANAE LU!",
+  lines: [
+    "You defeated the Alarm Clock Boss!",
+    "Thank you for making me feel loved and appreciated.",
+    "I hope you know how grateful I am to have you.",
+    "I can't wait to marry you."
+  ],
+  signature: "- Gio"
+};
+const CARDS = {
+  l1:["We were classmates in elementary.","","Then years and years passed...","","Until one day.","","MISSION:","Pick her up at Chonghua Hospital!"],
+  l2:["There she was.","","The first time I saw you again","after all those years.","","Next stop: SRP Il Corso.","Tonight: a 10K run together!"],
+  l3:["10 kilometers. Done.","","Then we went to the food tents","inside Il Corso.","","MISSION: Eat all the food!"],
+  end:["Our first meet.","A jog? A date?","","We were so comfortable together,","like we'd known each other forever.","","That's when I knew:","she's the one."]
+};
+// ======================
+const cv=document.getElementById("c"),g=cv.getContext("2d"),W=320,H=480;
+const R=(x,y,w,h,c)=>{g.fillStyle=c;g.fillRect(x|0,y|0,w|0,h|0)};
+const text=(s,x,y,z,c="#fff",a="center")=>{g.fillStyle=c;g.font=`bold ${z}px "Courier New",monospace`;g.textAlign=a;g.fillText(s,x,y)};
+let ac;function beep(f,d,ty="square"){try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),v=ac.createGain();o.type=ty;o.frequency.value=f;v.gain.value=.04;o.connect(v);v.connect(ac.destination);o.start();v.gain.exponentialRampToValueAtTime(.0001,ac.currentTime+d);o.stop(ac.currentTime+d)}catch(e){}}
+let scene="title",t=0,hearts=5,inv=0,tx=W/2,bx=W/2,obs=[],parts=[],prog=0,spawnT=0,py=0,vy=0,caught=0,cardKey="l1",cardT=0,keys={};
+
+function goCard(k){scene="card";cardKey=k;cardT=0;}
+function startLevel(k){scene=k;hearts=5;inv=0;obs=[];parts=[];prog=0;spawnT=0;py=0;vy=0;caught=0;tx=bx=W/2;}
+function burst(x,y,c){for(let i=0;i<10;i++)parts.push({x,y,vx:(Math.random()-.5)*160,vy:(Math.random()-.5)*160,l:.6,c})}
+function hit(){if(inv>0)return;hearts--;inv=1;beep(120,.25,"sawtooth");}
+function act(){
+  if(scene==="title")goCard("l1");
+  else if(scene==="card"){
+    const n=CARDS[cardKey].join("").length;
+    if(cardT*35<n)cardT=999; else if(cardKey==="end")showEnd(); else startLevel(cardKey);
+  } else if(scene==="l2"&&py===0){vy=-420;beep(500,.08);}
+}
+cv.addEventListener("pointerdown",e=>{ptr(e);act()});
+cv.addEventListener("pointermove",ptr);
+function ptr(e){const r=cv.getBoundingClientRect();tx=(e.clientX-r.left)/r.width*W}
+addEventListener("keydown",e=>{keys[e.key]=1;if([" ","Enter","ArrowUp","w"].includes(e.key)&&scene!=="end")act()});
+addEventListener("keyup",e=>keys[e.key]=0);
+
+function update(dt){
+  t+=dt;cardT+=dt;
+  parts.forEach(p=>{p.x+=p.vx*dt;p.y+=p.vy*dt;p.l-=dt});parts=parts.filter(p=>p.l>0);
+  if(scene==="end"&&Math.random()<.5)parts.push({x:Math.random()*W,y:-5,vx:(Math.random()-.5)*30,vy:80+Math.random()*60,l:5,c:["#ffd54a","#ff6fa5","#6fe3ff","#9bff6f"][Math.random()*4|0]});
+  if(!["l1","l2","l3"].includes(scene))return;
+  prog+=dt;inv-=dt;spawnT-=dt;
+  if(keys.ArrowLeft||keys.a)tx-=240*dt;if(keys.ArrowRight||keys.d)tx+=240*dt;
+  tx=Math.max(50,Math.min(W-50,tx));bx+=(tx-bx)*Math.min(1,dt*12);
+  if(scene==="l1"){
+    if(prog<18&&spawnT<=0){spawnT=.6;obs.push({x:65+Math.random()*190,y:-30,car:Math.random()<.6,c:["#e33","#39f","#fc3","#9c4"][Math.random()*4|0]})}
+    obs.forEach(o=>{o.y+=(170+prog*3)*dt;if(Math.abs(o.x-bx)<20&&Math.abs(o.y-420)<28){hit();burst(o.x,o.y,"#f55")}});
+    obs=obs.filter(o=>o.y<H+40);
+    if(hearts<=0)startLevel("l1");if(prog>=22.5){beep(800,.2);goCard("l2")}
+  }
+  if(scene==="l2"){
+    vy+=1100*dt;py+=vy*dt;if(py>0){py=0;vy=0}
+    if(prog<28.5&&spawnT<=0){spawnT=1.1+Math.random()*.8;obs.push({x:W+20,w:14+((Math.random()*2)|0)*10,h:22})}
+    obs.forEach(o=>{o.x-=190*dt;if(o.x-o.w/2<142&&o.x+o.w/2>92&&py>-o.h+4)hit()});
+    obs=obs.filter(o=>o.x>-40);
+    if(hearts<=0)startLevel("l2");if(prog>=30){beep(800,.2);goCard("l3")}
+  }
+  if(scene==="l3"){
+    if(spawnT<=0){spawnT=.7;obs.push({x:35+Math.random()*250,y:-10,k:(Math.random()*3)|0,vy:110+Math.random()*40})}
+    obs.forEach(o=>{o.y+=o.vy*dt;if(o.y>405&&o.y<445&&Math.abs(o.x-bx)<34){o.dead=1;caught++;beep(700+caught*60,.1);burst(o.x,o.y,"#5dff9a")}});
+    obs=obs.filter(o=>!o.dead&&o.y<H+20);
+    if(caught>=6){beep(1000,.2);goCard("end")}
+  }
+}
+
+function runner(x,y,shirt,hair){
+  const s=Math.sin(t*14)*4;
+  R(x-6,y-34,12,6,hair);R(x-5,y-28,10,9,"#f2c9a0");R(x-6,y-19,12,12,shirt);
+  R(x-5+s,y-7,4,7,"#223");R(x+1-s,y-7,4,7,"#223");
+}
+function drawFood(o){
+  const x=o.x,y=o.y;g.globalAlpha=.25+.12*Math.sin(t*8);R(x-14,y-14,28,28,"#5dff9a");g.globalAlpha=1;
+  if(o.k===0){R(x-1,y-10,2,20,"#c98a4b");R(x-4,y-9,8,5,"#a5542a");R(x-4,y-2,8,5,"#a5542a");R(x-4,y+5,8,5,"#a5542a")}
+  else if(o.k===1){R(x-6,y-8,12,16,"#ffd54a");R(x-1,y-13,2,6,"#fff")}
+  else{R(x-9,y-3,18,9,"#fff");R(x-7,y-6,14,4,"#e8743b")}
+}
+function draw(){
+  R(0,0,W,H,"#1b1035");
+  for(let i=0;i<30;i++)R((i*97)%W,(i*53)%300,2,2,"#6b5aa0");
+  if(scene==="title"){
+    text("OUR FIRST DATE",W/2,150,26,"#ffd54a");text("A BIRTHDAY QUEST",W/2,185,16,"#ff6fa5");
+    text("for Danae Lu",W/2,230,14,"#6fe3ff");
+    if(((t*2)|0)%2)text("TAP or press SPACE to start",W/2,380,13,"#fff");return;
+  }
+  if(scene==="card"||scene==="end"){
+    if(scene==="card"){
+      const L=CARDS[cardKey];let n=cardT*35|0;
+      L.forEach((s,i)=>{const sh=s.slice(0,Math.max(0,n));n-=s.length;text(sh,W/2,110+i*28,14,s.startsWith("MISSION")?"#ffd54a":"#fff")});
+      if(((t*2)|0)%2)text("tap to continue",W/2,440,12,"#6fe3ff");
+    }
+    parts.forEach(p=>R(p.x,p.y,3,3,p.c));return;
+  }
+  if(scene==="l1"){
+    R(0,0,W,H,"#173a2a");R(40,0,240,H,"#33333f");R(40,0,4,H,"#ddd");R(276,0,4,H,"#ddd");
+    for(let i=0;i<9;i++){const y=((i*60+prog*170)%540)-30;R(158,y,4,30,"#ddd")}
+    obs.forEach(o=>{
+      if(o.car){R(o.x-14,o.y-22,28,44,o.c);R(o.x-10,o.y-12,20,10,"#9cf");R(o.x-16,o.y-16,3,10,"#111");R(o.x+13,o.y-16,3,10,"#111");R(o.x-16,o.y+8,3,10,"#111");R(o.x+13,o.y+8,3,10,"#111")}
+      else{R(o.x-9,o.y-9,18,18,"#f80");R(o.x-4,o.y-4,8,8,"#fff")}
+    });
+    if(prog>=18){const y=(prog-18)*100-110;R(40,y,240,100,"#e8f0ff");R(150,y+10,20,20,"#e33");R(156,y+6,8,28,"#e33");R(60,y+45,50,20,"#9cf");R(210,y+45,50,20,"#9cf");text("CHONGHUA HOSPITAL",W/2,y+88,11,"#223")}
+    if(inv<=0||((t*20)|0)%2){R(bx-3,420-22,6,12,"#111");R(bx-3,430,6,12,"#111");R(bx-6,410,12,22,"#e33");R(bx-6,414,12,10,"#fc3")}
+    text("Dodge traffic!",W/2,24,13,"#ffd54a");
+  }
+  if(scene==="l2"){
+    R(250,40,24,24,"#ffe9a8");R(0,400,W,80,"#2c1b52");R(0,398,W,3,"#6b5aa0");
+    for(let i=0;i<3;i++){const x=((i*140-prog*60)%420+420)%420-40;R(x,300,4,100,"#555");R(x-6,296,16,6,"#ffd54a")}
+    obs.forEach(o=>{R(o.x-o.w/2,400-o.h,o.w,o.h,"#f80");R(o.x-o.w/2+3,400-o.h+4,o.w-6,5,"#fff")});
+    if(inv>0&&((t*20)|0)%2)g.globalAlpha=.4;
+    runner(110,400+py,"#3a7bd5","#222");runner(135,400+py,"#2fb5a8","#3a2a1a");g.globalAlpha=1;
+    text(`SRP Il Corso 10K: ${Math.min(10,prog/3).toFixed(1)} / 10 km`,W/2,24,12,"#ffd54a");
+    if(prog<4)text("TAP to jump!",W/2,60,13,"#6fe3ff");
+  }
+  if(scene==="l3"){
+    for(let i=0;i<4;i++){R(i*85+10,300,70,100,"#7a3b2e");R(i*85+5,285,80,18,i%2?"#ff6fa5":"#ffd54a")}
+    for(let i=0;i<16;i++)R(i*21,60+Math.sin(i)*6,5,5,["#ffd54a","#ff6fa5","#6fe3ff"][(i+((t*3)|0))%3]);
+    obs.forEach(drawFood);R(bx-26,428,52,8,"#fff");R(bx-20,436,40,4,"#bbb");
+    text(`Food: ${caught} / 6`,W/2,24,13,"#ffd54a");text("Catch the food!",W/2,44,12,"#5dff9a");
+  }
+  parts.forEach(p=>R(p.x,p.y,3,3,p.c));
+  for(let i=0;i<5&&scene!=="l3";i++)R(8+i*16,34,12,12,i<hearts?"#ff4d6d":"#3b2a5e");
+}
+function showEnd(){
+  scene="end";const el=document.getElementById("end"),m=document.getElementById("msg"),b=document.getElementById("again");
+  document.getElementById("t").textContent=CONFIG.title;document.getElementById("sig").textContent=CONFIG.signature;
+  m.innerHTML="";el.style.display="flex";b.style.display="none";
+  CONFIG.lines.forEach((l,n)=>setTimeout(()=>{const p=document.createElement("p");m.appendChild(p);let k=0;const iv=setInterval(()=>{p.textContent=l.slice(0,++k);if(k>=l.length)clearInterval(iv)},35)},n*2200));
+  setTimeout(()=>b.style.display="inline-block",CONFIG.lines.length*2200+1500);
+  [523,659,784,1047].forEach((f,k)=>setTimeout(()=>beep(f,.2),k*150));
+}
+document.getElementById("again").onclick=()=>{document.getElementById("end").style.display="none";scene="title"};
+let last=performance.now();
+(function loop(n){const dt=Math.min(.05,(n-last)/1000);last=n;update(dt);draw();requestAnimationFrame(loop)})(last);
+</script></body></html>
