@@ -87,7 +87,7 @@ function update(dt){
 function mark(x,y,w,h,c){g.globalAlpha=.22+.14*Math.sin(t*8);R(x-w/2-6,y-h/2-6,w+12,h+12,c);g.globalAlpha=1;R(x-w/2-2,y-h/2-2,w+4,2,c);R(x-w/2-2,y+h/2,w+4,2,c);R(x-w/2-2,y-h/2,2,h,c);R(x+w/2,y-h/2,2,h,c)}
 function runner(x,y,shirt,hair){
   const s=Math.sin(t*14)*4;
-  R(x-6,y-34,12,6,hair);R(x-5,y-28,10,9,"#f2c9a0");R(x-6,y-19,12,12,shirt);
+  R(x-6,y-34,12,6,hair);R(x-5,y-28,10,9,"#f2c9a0");R(x-7,y-20,14,14,"#8f7bb8");R(x-6,y-19,12,12,shirt);
   R(x-5+s,y-7,4,7,"#223");R(x+1-s,y-7,4,7,"#223");
 }
 function drawFood(o){
@@ -133,7 +133,7 @@ function draw(){
       else{R(o.x-9,o.y-9,18,18,"#f80");R(o.x-4,o.y-4,8,8,"#fff")}
     });
     if(prog>=18){const y=(prog-18)*100-110;R(40,y,240,100,"#e8f0ff");R(150,y+10,20,20,"#e33");R(156,y+6,8,28,"#e33");R(60,y+45,50,20,"#9cf");R(210,y+45,50,20,"#9cf");text("CHONGHUA HOSPITAL",W/2,y+88,11,"#223")}
-    if(inv<=0||((t*20)|0)%2){R(bx-3,420-22,6,12,"#111");R(bx-3,430,6,12,"#111");R(bx-6,410,12,22,"#e33");R(bx-6,414,12,10,"#fc3")}
+    if(inv<=0||((t*20)|0)%2){R(bx-3,420-22,6,12,"#111");R(bx-3,430,6,12,"#111");R(bx-6,410,12,22,"#ff8a1f");R(bx-6,414,12,10,"#fc3")}
     text("AVOID the red-glow traffic!",W/2,24,12,"#ff6b6b");
   }
   if(scene==="l2"){
@@ -141,7 +141,7 @@ function draw(){
     for(let i=0;i<3;i++){const x=((i*140-prog*60)%420+420)%420-40;R(x,300,4,100,"#555");R(x-6,296,16,6,"#ffd54a")}
     obs.forEach(o=>{mark(o.x,400-o.h/2,o.w,o.h,"#ff2d2d");R(o.x-o.w/2,400-o.h,o.w,o.h,"#f80");R(o.x-o.w/2+3,400-o.h+4,o.w-6,5,"#fff")});
     if(inv>0&&((t*20)|0)%2)g.globalAlpha=.4;
-    runner(110,400+py,"#3a7bd5","#222");runner(135,400+py,"#2fb5a8","#3a2a1a");g.globalAlpha=1;
+    runner(110,400+py,"#111","#222");runner(135,400+py,"#ff6fa5","#3a2a1a");g.globalAlpha=1;
     text(`SRP Il Corso 10K: ${Math.min(10,prog/3).toFixed(1)} / 10 km`,W/2,24,12,"#ffd54a");
     text("JUMP over the red-glow hurdles!",W/2,60,12,"#ff6b6b");
   }
