@@ -25,7 +25,7 @@ const CONFIG = {
   signature: "- Gio"
 };
 const CARDS = {
-  l1:["Once upon a time, a boy and a girl shared a classroom in elementary.","","Then years passed, and they became total strangers...","","Until one fateful day.","","MISSION:","Pick you up at Chonghua Hospital!"],
+  l1:["Once upon a time, a boy and a girl shared a classroom in elementary.","","Then years passed, and they became total strangers...","","Until one fateful day.","","MISSION:","Pick you up at Chong Hua Hospital!"],
   l2:["And there you stood.","","Seeing you again after all those years,","the rest of the world just faded away.","","Next stop: SRP IL Corso.","Tonight: running 10K together!"],
   l3:["10 kilometers down.","","Then we explored the food stalls","around IL Corso.","","MISSION: Eat everything in sight!"],
   end:["Our very first meetup.","Just a run? Or our first real date?","","We were so natural together,","like we had never been apart.","","That was the exact moment I knew:","you are the one."]
@@ -132,7 +132,7 @@ function draw(){
       if(o.car){R(o.x-14,o.y-22,28,44,o.c);R(o.x-10,o.y-12,20,10,"#9cf");R(o.x-16,o.y-16,3,10,"#111");R(o.x+13,o.y-16,3,10,"#111");R(o.x-16,o.y+8,3,10,"#111");R(o.x+13,o.y+8,3,10,"#111")}
       else{R(o.x-9,o.y-9,18,18,"#f80");R(o.x-4,o.y-4,8,8,"#fff")}
     });
-    if(prog>=18){const y=(prog-18)*100-110;R(40,y,240,100,"#e8f0ff");R(150,y+10,20,20,"#e33");R(156,y+6,8,28,"#e33");R(60,y+45,50,20,"#9cf");R(210,y+45,50,20,"#9cf");text("CHONGHUA HOSPITAL",W/2,y+88,11,"#223")}
+    if(prog>=18){const y=(prog-18)*100-110;R(40,y,240,100,"#e8f0ff");R(150,y+10,20,20,"#e33");R(156,y+6,8,28,"#e33");R(60,y+45,50,20,"#9cf");R(210,y+45,50,20,"#9cf");text("CHONG HUA HOSPITAL",W/2,y+88,11,"#223")}
     if(inv<=0||((t*20)|0)%2){R(bx-3,420-22,6,12,"#111");R(bx-3,430,6,12,"#111");R(bx-6,410,12,22,"#ff8a1f");R(bx-6,414,12,10,"#fc3")}
     text("AVOID the red-glow traffic!",W/2,24,12,"#ff6b6b");
   }
